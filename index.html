@@ -1,0 +1,868 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-control-geocoder.Geocoder.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title>Yerington Mine - Mason Valley Water Rights</title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/multi-style-layer.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-control-geocoder.Geocoder.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="data/Parcel_Ditches_to_POU_1.js"></script>
+        <script src="data/Parcel_Ditches_to_C125Claims_2.js"></script>
+        <script src="data/mason_smith_lateral_ditches_3.js"></script>
+        <script src="data/mason_smith__eastwalker_primary_ditches_4.js"></script>
+        <script src="data/mason_smith_drains_5.js"></script>
+        <script src="data/EastWalker_MainDitches_6.js"></script>
+        <script src="data/Active_IRR_06032024_Mason_7.js"></script>
+        <script src="data/MasonValley_Basin_8.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        }).fitBounds([[39.000232415883254,-119.34977807499699],[39.14479495312598,-119.02544734773771]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        document.querySelector(".leaflet-popup-pane").addEventListener("load", function(event) {
+          var tagName = event.target.tagName,
+            popup = map._popup;
+          // Also check if flag is already set.
+          if (tagName === "IMG" && popup && !popup._updated) {
+            popup._updated = true; // Set flag to prevent looping.
+            popup.update();
+          }
+        }, true);
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'feet',
+            secondaryLengthUnit: 'miles',
+            primaryAreaUnit: 'sqfeet',
+            secondaryAreaUnit: 'sqmiles'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0]
+        .className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+            map.setMaxBounds(map.getBounds());
+        }
+        map.createPane('pane_ESRISatellite_0');
+        map.getPane('pane_ESRISatellite_0').style.zIndex = 400;
+        var layer_ESRISatellite_0 = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            pane: 'pane_ESRISatellite_0',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 20
+        });
+        layer_ESRISatellite_0;
+        map.addLayer(layer_ESRISatellite_0);
+        function pop_Parcel_Ditches_to_POU_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">APN</th>\
+                        <td>' + (feature.properties['APN'] !== null ? autolinker.link(feature.properties['APN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">APN Acres</th>\
+                        <td>' + (feature.properties['PACRES'] !== null ? autolinker.link(feature.properties['PACRES'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Owner Name</th>\
+                        <td>' + (feature.properties['PANAME'] !== null ? autolinker.link(feature.properties['PANAME'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">County Link</th>\
+                        <td>' + (feature.properties['ASSRDLINK'] !== null ? autolinker.link(feature.properties['ASSRDLINK'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Ditch Name</th>\
+                        <td>' + (feature.properties['Ditch'] !== null ? autolinker.link(feature.properties['Ditch'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NDWR Water Right #</th>\
+                        <td>' + (feature.properties['app'] !== null ? autolinker.link(feature.properties['app'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Water Right Status</th>\
+                        <td>' + (feature.properties['app_status'] !== null ? autolinker.link(feature.properties['app_status'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Cert. #</th>\
+                        <td>' + (feature.properties['cert'] !== null ? autolinker.link(feature.properties['cert'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Manner of Use</th>\
+                        <td>' + (feature.properties['mou'] !== null ? autolinker.link(feature.properties['mou'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Source</th>\
+                        <td>' + (feature.properties['source'] !== null ? autolinker.link(feature.properties['source'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Source Name</th>\
+                        <td>' + (feature.properties['source_des'] !== null ? autolinker.link(feature.properties['source_des'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">duty_balan</th>\
+                        <td>' + (feature.properties['duty_balan'] !== null ? autolinker.link(feature.properties['duty_balan'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">diversio_1</th>\
+                        <td>' + (feature.properties['diversio_1'] !== null ? autolinker.link(feature.properties['diversio_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NDWR POU Acres</th>\
+                        <td>' + (feature.properties['pou_acre_t'] !== null ? autolinker.link(feature.properties['pou_acre_t'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">priority_d</th>\
+                        <td>' + (feature.properties['priority_d'] !== null ? autolinker.link(feature.properties['priority_d'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NDWR Hyperlink</th>\
+                        <td>' + (feature.properties['permit_rec'] !== null ? autolinker.link(feature.properties['permit_rec'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Project_ID'] !== null ? autolinker.link(feature.properties['Project_ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_Parcel_Ditches_to_POU_1_0() {
+            return {
+                pane: 'pane_Parcel_Ditches_to_POU_1',
+                opacity: 1,
+                color: 'rgba(227,26,28,1.0)',
+                dashArray: '8.0,4.0,2.0,4.0',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Parcel_Ditches_to_POU_1');
+        map.getPane('pane_Parcel_Ditches_to_POU_1').style.zIndex = 401;
+        map.getPane('pane_Parcel_Ditches_to_POU_1').style['mix-blend-mode'] = 'normal';
+        var layer_Parcel_Ditches_to_POU_1 = new L.geoJson(json_Parcel_Ditches_to_POU_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Parcel_Ditches_to_POU_1',
+            layerName: 'layer_Parcel_Ditches_to_POU_1',
+            pane: 'pane_Parcel_Ditches_to_POU_1',
+            onEachFeature: pop_Parcel_Ditches_to_POU_1,
+            style: style_Parcel_Ditches_to_POU_1_0,
+        });
+        bounds_group.addLayer(layer_Parcel_Ditches_to_POU_1);
+        map.addLayer(layer_Parcel_Ditches_to_POU_1);
+        function pop_Parcel_Ditches_to_C125Claims_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">APN</th>\
+                        <td>' + (feature.properties['APN'] !== null ? autolinker.link(feature.properties['APN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">APN Acres</th>\
+                        <td>' + (feature.properties['PACRES'] !== null ? autolinker.link(feature.properties['PACRES'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Owner Name</th>\
+                        <td>' + (feature.properties['PANAME'] !== null ? autolinker.link(feature.properties['PANAME'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">County Link</th>\
+                        <td>' + (feature.properties['ASSRDLINK'] !== null ? autolinker.link(feature.properties['ASSRDLINK'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Ditch Name</th>\
+                        <td>' + (feature.properties['Ditch'] !== null ? autolinker.link(feature.properties['Ditch'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Claim #</th>\
+                        <td>' + (feature.properties['CLAIM'] !== null ? autolinker.link(feature.properties['CLAIM'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Ditch Decree Name</th>\
+                        <td>' + (feature.properties['DITCH_DECR'] !== null ? autolinker.link(feature.properties['DITCH_DECR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">DITCH_DEC1</th>\
+                        <td>' + (feature.properties['DITCH_DEC1'] !== null ? autolinker.link(feature.properties['DITCH_DEC1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">DITCH_DEC2</th>\
+                        <td>' + (feature.properties['DITCH_DEC2'] !== null ? autolinker.link(feature.properties['DITCH_DEC2'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Ditch Assigned</th>\
+                        <td>' + (feature.properties['DITCHASSIG'] !== null ? autolinker.link(feature.properties['DITCHASSIG'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Pahl1997</th>\
+                        <td>' + (feature.properties['Pahl1997'] !== null ? autolinker.link(feature.properties['Pahl1997'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">OWNERPAHL9</th>\
+                        <td>' + (feature.properties['OWNERPAHL9'] !== null ? autolinker.link(feature.properties['OWNERPAHL9'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Water Right Acres</th>\
+                        <td>' + (feature.properties['WR_Acres'] !== null ? autolinker.link(feature.properties['WR_Acres'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">WR App. Change By #1</th>\
+                        <td>' + (feature.properties['Change_By'] !== null ? autolinker.link(feature.properties['Change_By'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">WR App. Change By #2</th>\
+                        <td>' + (feature.properties['ChangeBy_2'] !== null ? autolinker.link(feature.properties['ChangeBy_2'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Non-Water Right Acres</th>\
+                        <td>' + (feature.properties['non_WR_acr'] !== null ? autolinker.link(feature.properties['non_WR_acr'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">F_WR_Acres</th>\
+                        <td>' + (feature.properties['F_WR_Acres'] !== null ? autolinker.link(feature.properties['F_WR_Acres'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Project_ID</th>\
+                        <td>' + (feature.properties['Project_ID'] !== null ? autolinker.link(feature.properties['Project_ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_Parcel_Ditches_to_C125Claims_2_0() {
+            return {
+                pane: 'pane_Parcel_Ditches_to_C125Claims_2',
+                opacity: 1,
+                color: 'rgba(0,21,255,1.0)',
+                dashArray: '8.0,4.0,2.0,4.0',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Parcel_Ditches_to_C125Claims_2');
+        map.getPane('pane_Parcel_Ditches_to_C125Claims_2').style.zIndex = 402;
+        map.getPane('pane_Parcel_Ditches_to_C125Claims_2').style['mix-blend-mode'] = 'normal';
+        var layer_Parcel_Ditches_to_C125Claims_2 = new L.geoJson(json_Parcel_Ditches_to_C125Claims_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Parcel_Ditches_to_C125Claims_2',
+            layerName: 'layer_Parcel_Ditches_to_C125Claims_2',
+            pane: 'pane_Parcel_Ditches_to_C125Claims_2',
+            onEachFeature: pop_Parcel_Ditches_to_C125Claims_2,
+            style: style_Parcel_Ditches_to_C125Claims_2_0,
+        });
+        bounds_group.addLayer(layer_Parcel_Ditches_to_C125Claims_2);
+        map.addLayer(layer_Parcel_Ditches_to_C125Claims_2);
+        function pop_mason_smith_lateral_ditches_3(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Ditch Name</th>\
+                        <td>' + (feature.properties['Name'] !== null ? autolinker.link(feature.properties['Name'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_mason_smith_lateral_ditches_3_0() {
+            return {
+                pane: 'pane_mason_smith_lateral_ditches_3',
+                opacity: 1,
+                color: 'rgba(31,255,248,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_mason_smith_lateral_ditches_3');
+        map.getPane('pane_mason_smith_lateral_ditches_3').style.zIndex = 403;
+        map.getPane('pane_mason_smith_lateral_ditches_3').style['mix-blend-mode'] = 'normal';
+        var layer_mason_smith_lateral_ditches_3 = new L.geoJson(json_mason_smith_lateral_ditches_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_mason_smith_lateral_ditches_3',
+            layerName: 'layer_mason_smith_lateral_ditches_3',
+            pane: 'pane_mason_smith_lateral_ditches_3',
+            onEachFeature: pop_mason_smith_lateral_ditches_3,
+            style: style_mason_smith_lateral_ditches_3_0,
+        });
+        bounds_group.addLayer(layer_mason_smith_lateral_ditches_3);
+        map.addLayer(layer_mason_smith_lateral_ditches_3);
+        function pop_mason_smith__eastwalker_primary_ditches_4(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Ditch Name</th>\
+                        <td>' + (feature.properties['Name'] !== null ? autolinker.link(feature.properties['Name'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_mason_smith__eastwalker_primary_ditches_4_0() {
+            return {
+                pane: 'pane_mason_smith__eastwalker_primary_ditches_4',
+                opacity: 1,
+                color: 'rgba(59,248,21,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_mason_smith__eastwalker_primary_ditches_4');
+        map.getPane('pane_mason_smith__eastwalker_primary_ditches_4').style.zIndex = 404;
+        map.getPane('pane_mason_smith__eastwalker_primary_ditches_4').style['mix-blend-mode'] = 'normal';
+        var layer_mason_smith__eastwalker_primary_ditches_4 = new L.geoJson(json_mason_smith__eastwalker_primary_ditches_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_mason_smith__eastwalker_primary_ditches_4',
+            layerName: 'layer_mason_smith__eastwalker_primary_ditches_4',
+            pane: 'pane_mason_smith__eastwalker_primary_ditches_4',
+            onEachFeature: pop_mason_smith__eastwalker_primary_ditches_4,
+            style: style_mason_smith__eastwalker_primary_ditches_4_0,
+        });
+        bounds_group.addLayer(layer_mason_smith__eastwalker_primary_ditches_4);
+        map.addLayer(layer_mason_smith__eastwalker_primary_ditches_4);
+        function pop_mason_smith_drains_5(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Ditch Name</th>\
+                        <td>' + (feature.properties['Name'] !== null ? autolinker.link(feature.properties['Name'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_mason_smith_drains_5_0() {
+            return {
+                pane: 'pane_mason_smith_drains_5',
+                opacity: 1,
+                color: 'rgba(255,230,36,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'round',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        function style_mason_smith_drains_5_1() {
+            return {
+                pane: 'pane_mason_smith_drains_5',
+                opacity: 1,
+                color: 'rgba(255,230,36,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        function style_mason_smith_drains_5_2() {
+            return {
+                pane: 'pane_mason_smith_drains_5',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_mason_smith_drains_5');
+        map.getPane('pane_mason_smith_drains_5').style.zIndex = 405;
+        map.getPane('pane_mason_smith_drains_5').style['mix-blend-mode'] = 'normal';
+        var layer_mason_smith_drains_5 = new L.geoJson.multiStyle(json_mason_smith_drains_5, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_mason_smith_drains_5',
+            layerName: 'layer_mason_smith_drains_5',
+            pane: 'pane_mason_smith_drains_5',
+            onEachFeature: pop_mason_smith_drains_5,
+            styles: [style_mason_smith_drains_5_0,style_mason_smith_drains_5_1,style_mason_smith_drains_5_2,]
+        });
+        bounds_group.addLayer(layer_mason_smith_drains_5);
+        map.addLayer(layer_mason_smith_drains_5);
+        function pop_EastWalker_MainDitches_6(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Name</th>\
+                        <td>' + (feature.properties['Name'] !== null ? autolinker.link(feature.properties['Name'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Target?</th>\
+                        <td>' + (feature.properties['Target?'] !== null ? autolinker.link(feature.properties['Target?'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_EastWalker_MainDitches_6_0(feature) {
+            switch(String(feature.properties['Target?'])) {
+                case 'Yes':
+                    return {
+                pane: 'pane_EastWalker_MainDitches_6',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 4.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        function style_EastWalker_MainDitches_6_1(feature) {
+            switch(String(feature.properties['Target?'])) {
+                case 'Yes':
+                    return {
+                pane: 'pane_EastWalker_MainDitches_6',
+                opacity: 1,
+                color: 'rgba(59,248,21,1.0)',
+                dashArray: '',
+                lineCap: 'round',
+                lineJoin: 'round',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_EastWalker_MainDitches_6');
+        map.getPane('pane_EastWalker_MainDitches_6').style.zIndex = 406;
+        map.getPane('pane_EastWalker_MainDitches_6').style['mix-blend-mode'] = 'normal';
+        var layer_EastWalker_MainDitches_6 = new L.geoJson.multiStyle(json_EastWalker_MainDitches_6, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_EastWalker_MainDitches_6',
+            layerName: 'layer_EastWalker_MainDitches_6',
+            pane: 'pane_EastWalker_MainDitches_6',
+            onEachFeature: pop_EastWalker_MainDitches_6,
+            styles: [style_EastWalker_MainDitches_6_0,style_EastWalker_MainDitches_6_1,]
+        });
+        bounds_group.addLayer(layer_EastWalker_MainDitches_6);
+        map.addLayer(layer_EastWalker_MainDitches_6);
+        function pop_Active_IRR_06032024_Mason_7(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">App #</th>\
+                        <td>' + (feature.properties['app'] !== null ? autolinker.link(feature.properties['app'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">App. Status</th>\
+                        <td>' + (feature.properties['app_status'] !== null ? autolinker.link(feature.properties['app_status'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Cert #</th>\
+                        <td>' + (feature.properties['cert'] !== null ? autolinker.link(feature.properties['cert'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">MOU</th>\
+                        <td>' + (feature.properties['mou'] !== null ? autolinker.link(feature.properties['mou'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Source</th>\
+                        <td>' + (feature.properties['source'] !== null ? autolinker.link(feature.properties['source'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">source_des</th>\
+                        <td>' + (feature.properties['source_des'] !== null ? autolinker.link(feature.properties['source_des'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">duty_balan</th>\
+                        <td>' + (feature.properties['duty_balan'] !== null ? autolinker.link(feature.properties['duty_balan'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">diversion_</th>\
+                        <td>' + (feature.properties['diversion_'] !== null ? autolinker.link(feature.properties['diversion_'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">diversio_1</th>\
+                        <td>' + (feature.properties['diversio_1'] !== null ? autolinker.link(feature.properties['diversio_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">pou_acre_t</th>\
+                        <td>' + (feature.properties['pou_acre_t'] !== null ? autolinker.link(feature.properties['pou_acre_t'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">priority_d</th>\
+                        <td>' + (feature.properties['priority_d'] !== null ? autolinker.link(feature.properties['priority_d'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['permit_dat'] !== null ? autolinker.link(feature.properties['permit_dat'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['publicatio'] !== null ? autolinker.link(feature.properties['publicatio'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['poc_filed_'] !== null ? autolinker.link(feature.properties['poc_filed_'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['decree_nam'] !== null ? autolinker.link(feature.properties['decree_nam'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['project_na'] !== null ? autolinker.link(feature.properties['project_na'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['monitor_pl'] !== null ? autolinker.link(feature.properties['monitor_pl'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['reporting_'] !== null ? autolinker.link(feature.properties['reporting_'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['meter_requ'] !== null ? autolinker.link(feature.properties['meter_requ'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['interbasin'] !== null ? autolinker.link(feature.properties['interbasin'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['hydro_asse'] !== null ? autolinker.link(feature.properties['hydro_asse'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['secondary_'] !== null ? autolinker.link(feature.properties['secondary_'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">permit_rec</th>\
+                        <td>' + (feature.properties['permit_rec'] !== null ? autolinker.link(feature.properties['permit_rec'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['record_las'] !== null ? autolinker.link(feature.properties['record_las'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['poc_due_da'] !== null ? autolinker.link(feature.properties['poc_due_da'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['pbu_due_da'] !== null ? autolinker.link(feature.properties['pbu_due_da'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['por_due_da'] !== null ? autolinker.link(feature.properties['por_due_da'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_Active_IRR_06032024_Mason_7_0() {
+            return {
+                pane: 'pane_Active_IRR_06032024_Mason_7',
+                radius: 14.0,
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(85,255,0,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Active_IRR_06032024_Mason_7');
+        map.getPane('pane_Active_IRR_06032024_Mason_7').style.zIndex = 407;
+        map.getPane('pane_Active_IRR_06032024_Mason_7').style['mix-blend-mode'] = 'normal';
+        var layer_Active_IRR_06032024_Mason_7 = new L.geoJson(json_Active_IRR_06032024_Mason_7, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Active_IRR_06032024_Mason_7',
+            layerName: 'layer_Active_IRR_06032024_Mason_7',
+            pane: 'pane_Active_IRR_06032024_Mason_7',
+            onEachFeature: pop_Active_IRR_06032024_Mason_7,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_Active_IRR_06032024_Mason_7_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Active_IRR_06032024_Mason_7);
+        map.addLayer(layer_Active_IRR_06032024_Mason_7);
+        function pop_MasonValley_Basin_8(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Basin #</th>\
+                        <td>' + (feature.properties['BasinID'] !== null ? autolinker.link(feature.properties['BasinID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Basin Name</th>\
+                        <td>' + (feature.properties['BasinName'] !== null ? autolinker.link(feature.properties['BasinName'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Hydrographic Region</th>\
+                        <td>' + (feature.properties['HydroReg_1'] !== null ? autolinker.link(feature.properties['HydroReg_1'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_MasonValley_Basin_8_0() {
+            return {
+                pane: 'pane_MasonValley_Basin_8',
+                opacity: 1,
+                color: 'rgba(0,170,255,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 2.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_MasonValley_Basin_8');
+        map.getPane('pane_MasonValley_Basin_8').style.zIndex = 408;
+        map.getPane('pane_MasonValley_Basin_8').style['mix-blend-mode'] = 'normal';
+        var layer_MasonValley_Basin_8 = new L.geoJson(json_MasonValley_Basin_8, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_MasonValley_Basin_8',
+            layerName: 'layer_MasonValley_Basin_8',
+            pane: 'pane_MasonValley_Basin_8',
+            onEachFeature: pop_MasonValley_Basin_8,
+            style: style_MasonValley_Basin_8_0,
+        });
+        bounds_group.addLayer(layer_MasonValley_Basin_8);
+        map.addLayer(layer_MasonValley_Basin_8);
+            var title = new L.Control();
+            title.onAdd = function (map) {
+                this._div = L.DomUtil.create('div', 'info');
+                this.update();
+                return this._div;
+            };
+            title.update = function () {
+                this._div.innerHTML = '<h2>Yerington Mine - Mason Valley Water Rights</h2>';
+            };
+            title.addTo(map);
+            var abstract = new L.Control({'position':'bottomleft'});
+            abstract.onAdd = function (map) {
+                this._div = L.DomUtil.create('div',
+                'leaflet-control abstract');
+                this._div.id = 'abstract'
+
+                    abstract.show();
+                    return this._div;
+                };
+                abstract.show = function () {
+                    this._div.classList.remove("abstract");
+                    this._div.classList.add("abstractUncollapsed");
+                    this._div.innerHTML = 'This is a web map designed to show properties in Mason Vally with surface and ground water rights along with named ditches, property boundaries, and various attribute data. ';
+            };
+            abstract.addTo(map);
+        var osmGeocoder = new L.Control.Geocoder({
+            collapsed: true,
+            position: 'topleft',
+            text: 'Search',
+            title: 'Testing'
+        }).addTo(map);
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .className += ' fa fa-search';
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .title += 'Search for a place';
+        var baseMaps = {};
+        var overlaysTree = [
+        {label: '<b>Project Layers</b>', selectAllCheckbox: true, children: [
+            {label: '<img src="legend/MasonValley_Basin_8.png" /> MasonValley_Basin', layer: layer_MasonValley_Basin_8},]},
+        {label: '<b>Property and Irrigation Rights Layers</b>', selectAllCheckbox: true, children: [
+            {label: '<img src="legend/Active_IRR_06032024_Mason_7.png" /> Active_IRR_06032024_Mason', layer: layer_Active_IRR_06032024_Mason_7},
+            {label: 'EastWalker_MainDitches<br /><table><tr><td style="text-align: center;"><img src="legend/EastWalker_MainDitches_6_Yes0.png" /></td><td>Yes</td></tr></table>', layer: layer_EastWalker_MainDitches_6},
+            {label: '<img src="legend/mason_smith_drains_5.png" /> mason_smith_drains', layer: layer_mason_smith_drains_5},
+            {label: '<img src="legend/mason_smith__eastwalker_primary_ditches_4.png" /> mason_smith__eastwalker_primary_ditches', layer: layer_mason_smith__eastwalker_primary_ditches_4},
+            {label: '<img src="legend/mason_smith_lateral_ditches_3.png" /> mason_smith_lateral_ditches', layer: layer_mason_smith_lateral_ditches_3},]},
+        {label: '<b>Analysis Layers</b>', selectAllCheckbox: true, children: [
+            {label: '<img src="legend/Parcel_Ditches_to_C125Claims_2.png" /> Parcel_Ditches_to_C125Claims', layer: layer_Parcel_Ditches_to_C125Claims_2},
+            {label: '<img src="legend/Parcel_Ditches_to_POU_1.png" /> Parcel_Ditches_to_POU', layer: layer_Parcel_Ditches_to_POU_1},]},
+        {label: '<b>DRG Layers</b>', selectAllCheckbox: true, children: [
+            {label: "ESRI Satellite", layer: layer_ESRISatellite_0},]},]
+        var lay = L.control.layers.tree(null, overlaysTree,{
+            //namedToggle: true,
+            //selectorBack: false,
+            //closedSymbol: '&#8862; &#x1f5c0;',
+            //openedSymbol: '&#8863; &#x1f5c1;',
+            //collapseAll: 'Collapse all',
+            //expandAll: 'Expand all',
+            collapsed: true,
+        });
+        lay.addTo(map);
+        L.control.scale({position: 'bottomleft', maxWidth: 100, metric: true, imperial: false, updateWhenIdle: false}).addTo(map);
+        setBounds();
+        var i = 0;
+        layer_Parcel_Ditches_to_POU_1.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['Project_ID'] !== null?String('<div style="color: #e31a1c; font-size: 6pt; font-family: \'MS Shell Dlg 2\', sans-serif;">' + layer.feature.properties['Project_ID']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_Parcel_Ditches_to_POU_1'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        var i = 0;
+        layer_Parcel_Ditches_to_C125Claims_2.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['Project_ID'] !== null?String('<div style="color: #0015ff; font-size: 6pt; font-family: \'MS Shell Dlg 2\', sans-serif;">' + layer.feature.properties['Project_ID']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_Parcel_Ditches_to_C125Claims_2'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        var i = 0;
+        layer_mason_smith_lateral_ditches_3.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['Name'] !== null?String('<div style="color: #08b9ff; font-size: 5pt; font-family: \'MS Shell Dlg 2\', sans-serif;">' + layer.feature.properties['Name']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_mason_smith_lateral_ditches_3'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        var i = 0;
+        layer_mason_smith__eastwalker_primary_ditches_4.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['Name'] !== null?String('<div style="color: #3bf815; font-size: 5pt; font-family: \'MS Shell Dlg 2\', sans-serif;">' + layer.feature.properties['Name']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_mason_smith__eastwalker_primary_ditches_4'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        var i = 0;
+        layer_EastWalker_MainDitches_6.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['Name'] !== null?String('<div style="color: #000000; font-size: 6pt; font-weight: bold; font-family: \'MS Shell Dlg 2\', sans-serif;">' + layer.feature.properties['Name']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_EastWalker_MainDitches_6'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        var i = 0;
+        layer_MasonValley_Basin_8.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['BasinName'] !== null?String('<div style="color: #00aaff; font-size: 8pt; font-family: \'Arial\', sans-serif;">' + layer.feature.properties['BasinName']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_MasonValley_Basin_8'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        resetLabels([layer_Parcel_Ditches_to_POU_1,layer_Parcel_Ditches_to_C125Claims_2,layer_mason_smith_lateral_ditches_3,layer_mason_smith__eastwalker_primary_ditches_4,layer_EastWalker_MainDitches_6,layer_MasonValley_Basin_8]);
+        map.on("zoomend", function(){
+            resetLabels([layer_Parcel_Ditches_to_POU_1,layer_Parcel_Ditches_to_C125Claims_2,layer_mason_smith_lateral_ditches_3,layer_mason_smith__eastwalker_primary_ditches_4,layer_EastWalker_MainDitches_6,layer_MasonValley_Basin_8]);
+        });
+        map.on("layeradd", function(){
+            resetLabels([layer_Parcel_Ditches_to_POU_1,layer_Parcel_Ditches_to_C125Claims_2,layer_mason_smith_lateral_ditches_3,layer_mason_smith__eastwalker_primary_ditches_4,layer_EastWalker_MainDitches_6,layer_MasonValley_Basin_8]);
+        });
+        map.on("layerremove", function(){
+            resetLabels([layer_Parcel_Ditches_to_POU_1,layer_Parcel_Ditches_to_C125Claims_2,layer_mason_smith_lateral_ditches_3,layer_mason_smith__eastwalker_primary_ditches_4,layer_EastWalker_MainDitches_6,layer_MasonValley_Basin_8]);
+        });
+        </script>
+    </body>
+</html>
